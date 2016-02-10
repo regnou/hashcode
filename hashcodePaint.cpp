@@ -79,10 +79,7 @@ int main(int argc, char** argv) {
   return 1;
   }
 
-
-
  string aLine;
-
 
  std::getline(fin,aLine);
  istringstream readStr(aLine);
@@ -103,15 +100,14 @@ int main(int argc, char** argv) {
    auto v = extractHorizontals(rawVect,aLine);
 
    createCmdVect(rawVect, cmdVect, r);
-   //dump<pair<int,int>>(v);
 
    r++;
   } while (!fin.eof());
 
   cout << "cmdVect.size: "  <<  cmdVect.size() << endl;
 
-  cout << "opening input file !" << inFileName << endl;
   fout.open(outFileName);
+  cout << "Wrote to output file !" << outFileName << endl;
   fout <<  cmdVect.size() << endl;
 
   dump(cmdVect, fout);
