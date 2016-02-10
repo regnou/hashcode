@@ -2,19 +2,38 @@
 #include <fstream>
 #include <utility>
 #include <vector>
+#include <sstream>
 
 
 using namespace std;
 
+void dump(vector<string>& myVect, ofstream& outF) {
+  auto iter = myVect.begin();
+  while (iter != myVect.end()) {
+     outF << *iter++ << endl;
+  }
+}
+
+void createCmdVect(vector<pair<int,int>>& inpVect, vector<string>& outVect, int row) {
+
+   char str[64];
+
+   for (auto pair : inpVect)  {
+     sprintf(str,"PAINT_LINE %d %d %d %d", row, pair.first, row, pair.second);
+     string aCmd(str);
+     outVect.push_back(aCmd);
+   }
+}
+
 /**
  Parses each line for blocks of #, 
  Return : a vector of int pairs, where each pair represents the start and 
- end+1 indexes of a # block.
+ end indexes of a # block.
 
   e.g. Input :   --###---######-
        Output :  pair<2,5>, pair<8,14>
 **/
-vector<pair<int,int>>& processLine(vector<pair<int,int>>& aVect, string aLine) {
+vector<pair<int,int>>& extractHorizontals(vector<pair<int,int>>& aVect, string aLine) {
 
  
  int p=0, q=0, i=0; 
@@ -28,26 +47,28 @@ vector<pair<int,int>>& processLine(vector<pair<int,int>>& aVect, string aLine) {
     q = i;
 
      if (p<len && q<len) {
-      auto pair = make_pair(p,q);
+      auto pair = make_pair(p,q-1);
       aVect.push_back(pair);
      }   
   }
 
   return aVect;
 
-} //processLine
+} //extractHorizontals
 
 
 int main(int argc, char** argv) {
 
  
-  if (argc <= 1) {
-    cout << "usage : prog [text file]" << endl;
+  if (argc <= 2) {
+    cout << "usage : prog [inpfile] [outfile]" << endl;
     return 1;
   }
 
  ifstream fin;
+ ofstream fout;
  char * inFileName = argv[1];
+ char * outFileName = argv[2];
 
  cout << "opening input file !" << inFileName << endl;
  fin.open(inFileName);
@@ -58,21 +79,43 @@ int main(int argc, char** argv) {
   return 1;
   }
 
+
+
  string aLine;
 
- vector<pair<int,int>> myVect;
 
+ std::getline(fin,aLine);
+ istringstream readStr(aLine);
+ 
+ int rows, cols;
+ readStr >> rows >> cols;
+
+ vector<pair<int,int>> rawVect;
+ vector<string> cmdVect;
+
+ int r = 0;
  do{
   std::getline(fin,aLine);
 
   if (aLine.empty() ) continue;
    cout << "[" << aLine << "]" << endl;
-   myVect.clear();
-   auto v = processLine(myVect,aLine);
+   rawVect.clear();
+   auto v = extractHorizontals(rawVect,aLine);
 
-   dump<pair<int,int>>(v);
+   createCmdVect(rawVect, cmdVect, r);
+   //dump<pair<int,int>>(v);
 
+   r++;
   } while (!fin.eof());
 
-  
+  cout << "cmdVect.size: "  <<  cmdVect.size() << endl;
+
+  cout << "opening input file !" << inFileName << endl;
+  fout.open(outFileName);
+  fout <<  cmdVect.size() << endl;
+
+  dump(cmdVect, fout);
+
+  fout.close();
+
 } //main
