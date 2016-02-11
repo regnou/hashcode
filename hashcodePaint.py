@@ -1,12 +1,13 @@
 #!/usr/bin/python
 
-
 import argparse
 
 # args
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--f', action='store', dest='input_file',
+                    help='Store a simple value')
+parser.add_argument('--o', action='store', dest='output_file',
                     help='Store a simple value')
 
 results = parser.parse_args()
@@ -49,6 +50,20 @@ class Square(object):
             # +1 because a line (in our case) must have an area of 1*width. And a cell must be an area of 1.
             return (self.x2-self.x1+1) * (self.y2-self.y1+1)
 
+    def toMachineCode(self):
+
+#        import ipdb
+ #       ipdb.set_trace()
+        
+        # line=square width=1, square=a square,
+        # if self.isLine():
+        #     command = "PAINT_LINE"
+        # else:
+        command = "PAINT_SQUARE"
+        
+        result = " ".join([command, str(self.x1), str(self.y1), str(self.x2), str(self.y2), "\n"])
+
+        return result
         
 class Picture(object):
 
@@ -233,13 +248,17 @@ with open(results.input_file) as f:
 
     
 
-    
+
+#    import ipdb
+#    ipdb.set_trace()
+    with open(results.output_file, "w") as fout:
    
-    for row in range(p.numrows):
-        for col in range(p.numcols):
-            square = p.get_biggest_square(row, col)
-            p.paintSquare(square)
-            
+        for row in range(p.numrows):
+            for col in range(p.numcols):
+                square = p.get_biggest_square(row, col)
+                p.paintSquare(square)
+                code = square.toMachineCode()
+                fout.write(code)
             
 
                 
