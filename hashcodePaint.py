@@ -42,7 +42,8 @@ class Square(object):
 
     def getarea(self):
 
-        return (self.x2-self.x1) * (self.y2-self.y1)
+        # +1 because a line (in our case) must have an area of 1*width. And a cell must be an area of 1.
+        return (self.x2-self.x1+1) * (self.y2-self.y1+1)
 
         
 class Picture(object):
