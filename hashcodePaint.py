@@ -109,15 +109,16 @@ class Picture(object):
                 c = self.picture[i][j]
 
                 # calculate the right distance
-                c.rd = self.calculateDistance(i, j, [0,1]) +1
+                c.rd = self.calculateDistance(i, j, [0,1])
                 # calculate the down distance
-                c.dd = self.calculateDistance(i, j, [1,0]) +1
+                c.dd = self.calculateDistance(i, j, [1,0])
                 
 
     def get_biggest_square_from_coords_following_vector(self, row, col, vector):
-#        import ipdb
-#        ipdb.set_trace()
+
         
+        # import ipdb
+        # ipdb.set_trace()
 
         newrow, newcol = row + vector[0], col + vector[1]
 
@@ -132,8 +133,13 @@ class Picture(object):
 #        newsquare = biggest_square_found.copy()
  #       newsquare = type('newsquare', biggest_square_found.__bases__, dict(biggest_square_found.__dict__))
         
+        # import ipdb
+        # ipdb.set_trace()
+        
         while (newrow < self.numrows and newcol < self.numcols and
                self.picture[newrow][newcol].value == filled and
+               ( ((vector[1] == 1) and self.picture[row][newcol].value == filled) or
+                 ((vector[0] == 1) and self.picture[newrow][col].value == filled)) and
                biggest_square_found.getarea() <= newsquare.getarea() 
               
         ):
@@ -141,12 +147,21 @@ class Picture(object):
             # the new square is bigger or have the same length than the old one
             biggest_square_found = newsquare
 
-            newrow += vector[0]
-            newcol += vector[1]
+            # horizontal
+            if (vector[1] == 1):
+                newcol += 1
+                if self.coords_within_picture(newrow, newcol):
+                    newrow = row + self.picture[row][newcol].rd
+            elif (vector[0] == 1):
+                newrow += 1
+                if self.coords_within_picture(newrow, newcol):
+                    newcol += col + self.picture[newrow][col].dd
 
             if self.coords_within_picture(newrow, newcol):
                 newsquare = Square(self.picture[row][col], row, col, self.picture[newrow][newcol], newrow, newcol)
                     
+        # import ipdb
+        # ipdb.set_trace()
 
         return biggest_square_found
 
