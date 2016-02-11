@@ -270,7 +270,8 @@ with open(results.input_file) as f:
 
 
     
-
+   
+    codeArr = []
 
     with open(results.output_file, "w") as fout:
    
@@ -282,7 +283,13 @@ with open(results.input_file) as f:
                     square = p.get_biggest_square(row, col)
                     p.paintSquare(square)
                     code = square.toMachineCode()
-                    fout.write(code)
+                    codeArr.append(code)
+
+        fout.write(str(len(codeArr)))
+        fout.write("\n")
+
+        for i in range(len(codeArr)):
+            fout.write(codeArr[i])
             
 
                 
