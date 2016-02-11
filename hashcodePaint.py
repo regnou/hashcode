@@ -28,7 +28,7 @@ class Cell(object):
         
 class Square(object):
 
-    def __init__(self, cell1, x1, y1, cell2, x2, y2):
+    def __init__(self, cell1=None, x1=-1, y1=-1, cell2=None, x2=-1, y2=-1):
 
         self.c1 = cell1
         self.x1 = x1
@@ -42,8 +42,12 @@ class Square(object):
 
     def getarea(self):
 
-        # +1 because a line (in our case) must have an area of 1*width. And a cell must be an area of 1.
-        return (self.x2-self.x1+1) * (self.y2-self.y1+1)
+        
+        if not self.c1 or not self.c2:
+            result = 0
+        else:
+            # +1 because a line (in our case) must have an area of 1*width. And a cell must be an area of 1.
+            return (self.x2-self.x1+1) * (self.y2-self.y1+1)
 
         
 class Picture(object):
@@ -94,8 +98,12 @@ class Picture(object):
     def get_biggest_square_from_coords_following_vector(self, row, col, vector):
         newrow, newcol = row + vector[0], col + vector[1]
 
+        biggest_square_found = None
+        if not self.coords_within_picture(newrow, newcol):
+            return biggest_square_found
 
         # accumulators
+            
         biggest_square_found = Square(self.picture[row][col], row, col, self.picture[newrow][newcol], newrow, newcol)
         newsquare = biggest_square_found
 #        newsquare = biggest_square_found.copy()
@@ -113,7 +121,7 @@ class Picture(object):
             newrow += vector[0]
             newcol += vector[1]
 
-            if self.coords_between_picture(newrow, newcol):
+            if self.coords_within_picture(newrow, newcol):
                 newsquare = Square(self.picture[row][col], row, col, self.picture[newrow][newcol], newrow, newcol)
                     
 
@@ -135,8 +143,6 @@ class Picture(object):
         # calculate the biggest real area going to the right and down
         # calculate the biggest potential area going down and to the right
        
-        newrow = row
-        newcol = col
         distance = 0
 
         # import ipdb
@@ -152,10 +158,17 @@ class Picture(object):
         # import ipdb
         # ipdb.set_trace()
 
+        if not right_square:
+            right_square=Square()
+            
+        if not down_square:
+            down_square=Square()
+        
+        
         return (right_square if right_square.getarea() > down_square.getarea() else down_square)
         
 
-    def coords_between_picture(self, x, y):
+    def coords_within_picture(self, x, y):
         return (x < self.numrows and 0 <= x and
                 y < self.numcols and 0 <= y)
 
