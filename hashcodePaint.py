@@ -50,16 +50,20 @@ class Square(object):
             # +1 because a line (in our case) must have an area of 1*width. And a cell must be an area of 1.
             return (self.x2-self.x1+1) * (self.y2-self.y1+1)
 
+    def isLine(self):
+
+        height = self.x2 - self.x1 +1
+        width = self.y2 - self.y1 +1
+
+        return (height == 1 or width == 1)
+        
     def toMachineCode(self):
 
-#        import ipdb
- #       ipdb.set_trace()
-        
         # line=square width=1, square=a square,
-        # if self.isLine():
-        #     command = "PAINT_LINE"
-        # else:
-        command = "PAINT_SQUARE"
+        if self.isLine():
+            command = "PAINT_LINE"
+        else:
+            command = "PAINT_SQUARE"
         
         result = " ".join([command, str(self.x1), str(self.y1), str(self.x2), str(self.y2), "\n"])
 
@@ -105,12 +109,16 @@ class Picture(object):
                 c = self.picture[i][j]
 
                 # calculate the right distance
-                c.rd = self.calculateDistance(i, j, [1,0])
+                c.rd = self.calculateDistance(i, j, [0,1]) +1
                 # calculate the down distance
-                c.dd = self.calculateDistance(i, j, [0,1])
+                c.dd = self.calculateDistance(i, j, [1,0]) +1
                 
 
     def get_biggest_square_from_coords_following_vector(self, row, col, vector):
+#        import ipdb
+#        ipdb.set_trace()
+        
+
         newrow, newcol = row + vector[0], col + vector[1]
 
         biggest_square_found = None
@@ -190,8 +198,8 @@ class Picture(object):
         
     def erase_cell(self, row, col):
 
-        # import ipdb
-        # ipdb.set_trace()
+#        import ipdb
+#        ipdb.set_trace()
 
         self.picture[row][col] = Cell()
 
@@ -200,7 +208,7 @@ class Picture(object):
         # up process
         # I'll look for the cells which are already filled and substract 1 from the down distance.
         vector=[0,-1]
-        up_distance_to_blank_cell = calculateDistance(row, col, vector)
+        up_distance_to_blank_cell = self.calculateDistance(row, col, vector)
 
         for i in range(row-up_distance_to_blank_cell, row):
             self.picture[i][col].dd -= 1
@@ -209,7 +217,7 @@ class Picture(object):
         # down process - almost copy-paste of the above code
         # I'll look for the cells which are already filled and substract 1 from the down distance.
         vector=[-1,0]
-        left_distance_to_blank_cell = calculateDistance(row, col, vector)
+        left_distance_to_blank_cell = self.calculateDistance(row, col, vector)
 
         for i in range(col-left_distance_to_blank_cell, col):
             self.picture[row][col].rd -= 1
@@ -219,11 +227,11 @@ class Picture(object):
     # Erase the square sq, instance of Square
     def paintSquare(self, sq):
 
-        # import ipdb
-        # ipdb.set_trace()
+#        import ipdb
+#        ipdb.set_trace()
 
-        for i in range(sq.x1, sq.x2):
-            for j in range(sq.y1, sq.y1):
+        for i in range(sq.x1, sq.x2+1):
+            for j in range(sq.y1, sq.y2+1):
                 self.erase_cell(i,j)
     
 
@@ -249,16 +257,17 @@ with open(results.input_file) as f:
     
 
 
-#    import ipdb
-#    ipdb.set_trace()
     with open(results.output_file, "w") as fout:
    
         for row in range(p.numrows):
             for col in range(p.numcols):
-                square = p.get_biggest_square(row, col)
-                p.paintSquare(square)
-                code = square.toMachineCode()
-                fout.write(code)
+                if p.picture[row][col].value == filled:
+#                    import ipdb
+#                    ipdb.set_trace()
+                    square = p.get_biggest_square(row, col)
+                    p.paintSquare(square)
+                    code = square.toMachineCode()
+                    fout.write(code)
             
 
                 
